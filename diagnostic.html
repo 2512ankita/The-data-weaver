@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Diagnostic</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+    h1 { color: #333; }
+    .test { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    .success { background-color: #d4edda; border-color: #c3e6cb; }
+    .error { background-color: #f8d7da; border-color: #f5c6cb; }
+    .info { background-color: #d1ecf1; border-color: #bee5eb; }
+    pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Data Weaver Dashboard - Diagnostic Tool</h1>
+  
+  <div id="results"></div>
+  
+  <script>
+    const results = document.getElementById('results');
+    
+    function addResult(title, status, message, data = null) {
+      const div = document.createElement('div');
+      div.className = `test ${status}`;
+      div.innerHTML = `
+        <h3>${title}</h3>
+        <p>${message}</p>
+        ${data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''}
+      `;
+      results.appendChild(div);
+    }
+    
+    async function runDiagnostics() {
+      results.innerHTML = '<p>Running diagnostics...</p>';
+      
+      // Test 1: Check if config.json is accessible
+      try {
+        const response = await fetch('/config.json');
+        if (response.ok) {
+          const config = await response.json();
+          addResult(
+            '✓ Configuration File',
+            'success',
+            'config.json is accessible and valid',
+            { dataSources: Object.keys(config.dataSources) }
+          );
+        } else {
+          addResult(
+            '✗ Configuration File',
+            'error',
+            `Failed to load config.json: ${response.status} ${response.statusText}`
+          );
+        }
+      } catch (error) {
+        addResult(
+          '✗ Configuration File',
+          'error',
+          `Error loading config.json: ${error.message}`
+        );
+      }
+      
+      // Test 2: Check CoinGecko API (no auth required)
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/ping');
+        if (response.ok) {
+          const data = await response.json();
+          addResult(
+            '✓ CoinGecko API',
+            'success',
+            'CoinGecko API is accessible',
+            data
+          );
+        } else {
+          addResult(
+            '✗ CoinGecko API',
+            'error',
+            `CoinGecko API returned: ${response.status}`
+          );
+        }
+      } catch (error) {
+        addResult(
+          '✗ CoinGecko API',
+          'error',
+          `Cannot reach CoinGecko API: ${error.message}`
+        );
+      }
+      
+      // Test 3: Check environment variables
+      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      if (apiKey && apiKey !== 'your_openweather_api_key_here') {
+        addResult(
+          '✓ OpenWeather API Key',
+          'success',
+          'API key is configured',
+          { keyLength: apiKey.length, keyPreview: apiKey.substring(0, 8) + '...' }
+        );
+      } else {
+        addResult(
+          '⚠ OpenWeather API Key',
+          'info',
+          'API key not configured or using placeholder. Air quality data will not load.',
+          { configured: false }
+        );
+      }
+      
+      // Test 4: Try fetching Bitcoin data
+      try {
+        const now = Math.floor(Date.now() / 1000);
+        const oneDayAgo = now - (24 * 60 * 60);
+        const url = `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${oneDayAgo}&to=${now}`;
+        
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          addResult(
+            '✓ Bitcoin Data Fetch',
+            'success',
+            `Successfully fetched ${data.prices?.length || 0} Bitcoin price data points`,
+            { samplePrice: data.prices?.[0] }
+          );
+        } else {
+          addResult(
+            '✗ Bitcoin Data Fetch',
+            'error',
+            `Failed to fetch Bitcoin data: ${response.status}`
+          );
+        }
+      } catch (error) {
+        addResult(
+          '✗ Bitcoin Data Fetch',
+          'error',
+          `Error fetching Bitcoin data: ${error.message}`
+        );
+      }
+      
+      // Test 5: Check if main application files are accessible
+      try {
+        const response = await fetch('/src/main.js');
+        if (response.ok) {
+          addResult(
+            '✓ Application Files',
+            'success',
+            'Main application files are accessible'
+          );
+        } else {
+          addResult(
+            '⚠ Application Files',
+            'info',
+            'Cannot directly access source files (this is normal in production)'
+          );
+        }
+      } catch (error) {
+        addResult(
+          '⚠ Application Files',
+          'info',
+          'Source files check skipped'
+        );
+      }
+      
+      addResult(
+        'Diagnostic Complete',
+        'info',
+        'All tests completed. Check results above for any issues.'
+      );
+    }
+    
+    // Run diagnostics on page load
+    runDiagnostics();
+  </script>
+</body>
+</html>

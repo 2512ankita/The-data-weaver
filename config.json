@@ -1,0 +1,68 @@
+{
+    "mcpVersion":  "1.0",
+    "projectName":  "data-weaver-dashboard",
+    "dataSources":  {
+                        "weather":  {
+                                        "name":  "Open-Meteo Weather",
+                                        "description":  "Historical temperature data from Open-Meteo (free, no API key)",
+                                        "endpoint":  "https://archive-api.open-meteo.com/v1/archive",
+                                        "method":  "GET",
+                                        "authentication":  {
+                                                               "type":  "none"
+                                                           },
+                                        "rateLimit":  {
+                                                          "requestsPerMinute":  60,
+                                                          "strategy":  "throttle"
+                                                      },
+                                        "defaultParams":  {
+                                                              "latitude":  "40.7128",
+                                                              "longitude":  "-74.0060",
+                                                              "hourly":  "temperature_2m",
+                                                              "timezone":  "America/New_York"
+                                                          },
+                                        "transformation":  {
+                                                               "timestampField":  "hourly.time",
+                                                               "valueField":  "hourly.temperature_2m",
+                                                               "normalize":  true,
+                                                               "unit":  "°C",
+                                                               "description":  "Temperature in Celsius"
+                                                           }
+                                    },
+                        "currency":  {
+                                         "name":  "Frankfurter Currency Rates",
+                                         "description":  "EUR to USD exchange rates (free, no key needed)",
+                                         "endpoint":  "https://api.frankfurter.app/2024-01-01..2024-12-31",
+                                         "method":  "GET",
+                                         "authentication":  {
+                                                                "type":  "none"
+                                                            },
+                                         "rateLimit":  {
+                                                           "requestsPerMinute":  60,
+                                                           "strategy":  "throttle"
+                                                       },
+                                         "defaultParams":  {
+                                                               "from":  "EUR",
+                                                               "to":  "USD"
+                                                           },
+                                         "transformation":  {
+                                                                "timestampField":  "rates",
+                                                                "valueField":  "rates.USD",
+                                                                "normalize":  true,
+                                                                "unit":  "USD",
+                                                                "description":  "EUR to USD exchange rate"
+                                                            }
+                                     }
+                    },
+    "options":  {
+                    "defaultTimeRange":  168,
+                    "cache":  {
+                                  "enabled":  true,
+                                  "ttl":  300
+                              },
+                    "errorHandling":  {
+                                          "maxRetries":  3,
+                                          "retryDelay":  1000,
+                                          "backoffMultiplier":  2
+                                      }
+                }
+}

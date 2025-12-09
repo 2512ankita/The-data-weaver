@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Config Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Configuration Test</h1>
+  <div id="result"></div>
+  
+  <script type="module">
+    const result = document.getElementById('result');
+    
+    async function testConfig() {
+      try {
+        // Add cache buster
+        const response = await fetch(`/config.json?v=${Date.now()}`);
+        
+        if (!response.ok) {
+          result.innerHTML = `<p class="error">Failed to load config: ${response.status}</p>`;
+          return;
+        }
+        
+        const config = await response.json();
+        
+        result.innerHTML = `
+          <p class="success">✓ Configuration loaded successfully!</p>
+          <h3>Data Sources:</h3>
+          <ul>
+            ${Object.keys(config.dataSources).map(key => 
+              `<li><strong>${key}</strong>: ${config.dataSources[key].name}</li>`
+            ).join('')}
+          </ul>
+          <h3>Full Config:</h3>
+          <pre>${JSON.stringify(config, null, 2)}</pre>
+        `;
+        
+      } catch (error) {
+        result.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+      }
+    }
+    
+    testConfig();
+  </script>
+</body>
+</html>
