@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Weaver Dashboard</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="app" class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Header Section -->
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Data Weaver Dashboard</h1>
+      <p class="text-lg text-gray-600">Exploring patterns between weather conditions and currency exchange rates</p>
+    </header>
+
+    <!-- Controls Section -->
+    <div class="mb-6 flex flex-wrap gap-4 items-center">
+      <button id="refresh-button" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium shadow-sm">
+        Refresh Data
+      </button>
+      <div class="flex items-center gap-2">
+        <label for="time-range-select" class="text-sm font-medium text-gray-700">Time Range:</label>
+        <select id="time-range-select" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <option value="24h">Last 24 Hours</option>
+          <option value="7d" selected>Last 7 Days</option>
+          <option value="30d">Last 30 Days</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-indicator" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-8 shadow-xl">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-gray-700 font-medium">Loading data...</p>
+      </div>
+    </div>
+
+    <!-- Error Message Container -->
+    <div id="error-container" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <div class="flex-1">
+          <h3 class="text-sm font-medium text-red-800">Error</h3>
+          <p id="error-text" class="mt-1 text-sm text-red-700"></p>
+        </div>
+        <button id="error-close" class="ml-3 text-red-600 hover:text-red-800" onclick="this.parentElement.parentElement.parentElement.classList.add('hidden')">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Data Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Weather Card -->
+      <div id="data-card-1" class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Weather Data</h2>
+        <p class="text-gray-600">Loading...</p>
+      </div>
+
+      <!-- Currency Card -->
+      <div id="data-card-2" class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Currency Data</h2>
+        <p class="text-gray-600">Loading...</p>
+      </div>
+    </div>
+
+    <!-- Visualization Panel -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Data Visualization</h2>
+      <div class="relative" style="height: 400px;">
+        <canvas id="chart-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Insight Section -->
+    <div id="insight-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-6 border border-blue-100">
+      <h2 class="text-xl font-semibold text-gray-800 mb-3">Insights</h2>
+      <p class="text-gray-500 italic">Insights will appear here after data is loaded...</p>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
